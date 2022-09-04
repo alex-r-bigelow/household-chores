@@ -1,0 +1,22 @@
+{
+  "name": "household-chores",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex-r-bigelow/household-chores.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alex-r-bigelow/household-chores/issues"
+  },
+  "homepage": "https://github.com/alex-r-bigelow/household-chores#readme",
+  "dependencies": {
+    "serve": "^14.0.1"
+  }
+}
