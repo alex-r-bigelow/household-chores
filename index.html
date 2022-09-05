@@ -1,42 +1,63 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Sheets API Quickstart</title>
+    <title>Household Chores</title>
     <meta charset="utf-8" />
   </head>
   <body>
-    <p>Sheets API Quickstart</p>
-
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
 
-    <pre id="content"></pre>
+    <pre id="message"></pre>
 
     <script type="text/javascript">
-      /* exported gapiLoaded */
-      /* exported gisLoaded */
-      /* exported handleAuthClick */
-      /* exported handleSignoutClick */
-
       const CLIENT_ID =
         '1065408495518-kmhvq7drlk415qa0al8nl3lgpdte6pui.apps.googleusercontent.com';
       const API_KEY = 'AIzaSyBg-Ub1hnzOjSeMr0g-qDVhA5eOtlgl3ok';
-
-      // Discovery doc URL for APIs used by the quickstart
       const DISCOVERY_DOC =
         'https://sheets.googleapis.com/$discovery/rest?version=v4';
-
-      // Authorization scopes required by the API; multiple scopes can be
-      // included, separated by spaces.
-      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
       let tokenClient;
       let gapiInited = false;
       let gisInited = false;
+      let isLoggedIn = false;
+      let loadingError = null;
+      let allChores = null;
 
-      document.getElementById('authorize_button').style.visibility = 'hidden';
-      document.getElementById('signout_button').style.visibility = 'hidden';
+      function render() {
+        const authorizeButton = document.getElementById('authorize_button');
+        const signoutButton = document.getElementById('signout_button');
+        const message = document.getElementById('message');
+
+        if (!gapiInited || !gisInited) {
+          authorizeButton.style.visibility = 'hidden';
+          signoutButton.style.visibility = 'hidden';
+          message.innerHTML = 'Loading page...';
+          return;
+        }
+
+        authorizeButton.style.visibility = 'visible';
+
+        if (!isLoggedIn) {
+          authorizeButton.innerText = 'Sign in';
+          signoutButton.style.visibility = 'visible';
+          message.innerHTML = 'Currently signed out.';
+        } else {
+          authorizeButton.innerText = 'Refresh';
+          signoutButton.style.visibility = 'visible';
+          if (loadingError) {
+            message.innerHTML = loadingError.message;
+          } else if (allChores === null) {
+            message.innerHTML = 'Loading chores...';
+          } else if (allChores.length === 0) {
+            message.innerHTML = 'No data found!';
+          } else {
+            message.innerHTML = JSON.stringify(allChores, null, 2);
+          }
+        }
+      }
 
       /**
        * Callback after api.js is loaded.
@@ -55,7 +76,7 @@
           discoveryDocs: [DISCOVERY_DOC],
         });
         gapiInited = true;
-        maybeEnableButtons();
+        render();
       }
 
       /**
@@ -68,17 +89,7 @@
           callback: '', // defined later
         });
         gisInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Enables user interaction after all libraries are loaded.
-       */
-      function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById('authorize_button').style.visibility =
-            'visible';
-        }
+        render();
       }
 
       /**
@@ -89,10 +100,10 @@
           if (resp.error !== undefined) {
             throw resp;
           }
-          document.getElementById('signout_button').style.visibility =
-            'visible';
-          document.getElementById('authorize_button').innerText = 'Refresh';
-          await listMajors();
+          allChores = null;
+          isLoggedIn = true;
+          render();
+          await getChores();
         };
 
         if (gapi.client.getToken() === null) {
@@ -113,16 +124,15 @@
         if (token !== null) {
           google.accounts.oauth2.revoke(token.access_token);
           gapi.client.setToken('');
-          document.getElementById('content').innerText = '';
-          document.getElementById('authorize_button').innerText = 'Authorize';
-          document.getElementById('signout_button').style.visibility = 'hidden';
+          isLoggedIn = false;
+          render();
         }
       }
 
       /**
        * Print the chores list
        */
-      async function listMajors() {
+      async function getChores() {
         let response;
         try {
           response = await gapi.client.sheets.spreadsheets.values.get({
@@ -130,16 +140,16 @@
             range: 'Chores List!A1:H',
           });
         } catch (err) {
-          document.getElementById('content').innerText = err.message;
+          loadingError = err;
           return;
         }
         const range = response.result;
         if (!range || !range.values || range.values.length == 0) {
-          document.getElementById('content').innerText = 'No values found.';
+          allChores = [];
           return;
         }
         const headers = range.values.shift();
-        const allChores = range.values.map((row) =>
+        allChores = range.values.map((row) =>
           row.reduce(
             (agg, value, index) => ({
               ...agg,
@@ -148,11 +158,7 @@
             {}
           )
         );
-        document.getElementById('content').innerText = JSON.stringify(
-          allChores,
-          null,
-          2
-        );
+        render();
       }
     </script>
     <script
