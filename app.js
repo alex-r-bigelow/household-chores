@@ -1,5 +1,7 @@
 const TODAY = new Date();
 
+const previousCompleteDates = {};
+
 function setupChore(chore, index) {
   return `
     <div class="chore" id="chore${index}">
@@ -31,12 +33,13 @@ function setupChore(chore, index) {
   `;
 }
 
-function updateChores() {
+export function updateChores() {
   appState.allChores.forEach((chore, index) => {
     const dueDate = new Date(chore.Due);
-    const choreDue = !isNaN(dueDate) && dueDate < TODAY;
     const choreComplete =
-      !isNaN(dueDate) && dueDate.toDateString() === TODAY.toDateString();
+      previousCompleteDates[`chore${index}`] !== undefined ||
+      (!isNaN(dueDate) && dueDate.toDateString() === TODAY.toDateString());
+    const choreDue = !choreComplete && !isNaN(dueDate) && dueDate < TODAY;
 
     const choreElement = document.getElementById(`chore${index}`);
     choreElement.classList.toggle('due', choreDue);
@@ -44,6 +47,26 @@ function updateChores() {
 
     const checkboxElement = choreElement.querySelector('.checkbox');
     checkboxElement.checked = choreComplete;
+  });
+}
+
+function addCheckboxListeners() {
+  appState.allChores.forEach((chore, index) => {
+    const checkboxElement = document
+      .getElementById(`chore${index}`)
+      .querySelector('.checkbox');
+    checkboxElement.addEventListener('change', () => {
+      if (checkboxElement.checked) {
+        // Just checked something
+        previousCompleteDates[`chore${index}`] = chore.Completed || '';
+        window.updateChoreCompletedDate(index, TODAY.toDateString());
+      } else {
+        const previousCompleteDate =
+          previousCompleteDates[`chore${index}`] || '';
+        delete previousCompleteDates[`chore${index}`];
+        window.updateChoreCompletedDate(index, previousCompleteDate);
+      }
+    });
   });
 }
 
@@ -80,6 +103,7 @@ export function render() {
     } else {
       message.innerHTML = 'Chores loaded';
       pageContent.innerHTML = appState.allChores.map(setupChore).join('');
+      addCheckboxListeners();
       updateChores();
     }
   }

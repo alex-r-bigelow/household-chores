@@ -1,4 +1,4 @@
-import { render } from './app.js';
+import { render, updateChores } from './app.js';
 
 const CLIENT_ID =
   '1065408495518-kmhvq7drlk415qa0al8nl3lgpdte6pui.apps.googleusercontent.com';
@@ -58,11 +58,13 @@ async function getChores() {
     });
   } catch (err) {
     appState.loadingError = err;
+    render();
     return;
   }
   const range = response.result;
   if (!range || !range.values || range.values.length == 0) {
     appState.allChores = [];
+    render();
     return;
   }
   const headers = range.values.shift();
@@ -77,6 +79,23 @@ async function getChores() {
   );
   render();
 }
+
+window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
+  let response;
+  try {
+    response = await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
+      range: `Chores List!G${rowNumber + 2}`,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: [[completedDate]] },
+    });
+  } catch (err) {
+    appState.loadingError = err;
+    render();
+    return;
+  }
+  updateChores();
+};
 
 function setupButtonEvents() {
   const authorizeButton = document.getElementById('authorize_button');
