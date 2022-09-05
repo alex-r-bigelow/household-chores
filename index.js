@@ -54,7 +54,7 @@ async function getChores() {
   try {
     response = await gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
-      range: 'Chores List!A1:H',
+      range: 'Chores List!A1:I',
     });
   } catch (err) {
     appState.loadingError = err;

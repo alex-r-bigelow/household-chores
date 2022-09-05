@@ -3,15 +3,18 @@
   <head>
     <title>Household Chores</title>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css" />
     <script type="module" src="index.js"></script>
-    <script async defer src="https://apis.google.com/js/api.js"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
   </head>
   <body>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button">Authorize</button>
-    <button id="signout_button">Sign Out</button>
-
-    <pre id="message">Loading page...</pre>
+    <header>
+      <button id="authorize_button">Authorize</button>
+      <button id="signout_button">Sign Out</button>
+      <pre id="message">Loading page...</pre>
+    </header>
+    <content id="page_content"></content>
   </body>
 </html>

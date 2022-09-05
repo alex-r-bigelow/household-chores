@@ -1,0 +1,50 @@
+html,
+body,
+pre {
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  padding: 1em;
+  display: flex;
+  align-items: center;
+}
+header > * {
+  margin-right: 1em;
+}
+
+.chore {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border-top: 1px solid #ccc;
+}
+.chore details {
+  width: 100%;
+}
+.checkbox {
+  margin: 1em;
+}
+.task {
+  margin: 0.5em 0;
+  font-size: larger;
+}
+.stats {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: small;
+}
+.description,
+.notes {
+  margin: 0.25em 1.3em;
+}
+.chore.due {
+  background-color: #fdcdac;
+}
+.chore.complete {
+  background-color: #b3e2cd;
+}
+.chore.complete .task {
+  text-decoration: line-through;
+}
