@@ -12,6 +12,13 @@ const modes = {
   SHOPPING_LIST: 'SHOPPING_LIST',
 };
 window.modes = modes;
+const priorities = {
+  NEED: '1 - Need',
+  WANT: '2 - Want',
+  WISHLIST: '3 - Wishlist',
+  HAVE: '4 - Have',
+};
+window.priorities = priorities;
 
 const appState = {
   tokenClient: null,

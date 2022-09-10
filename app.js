@@ -6,7 +6,7 @@ import {
 import {
   setupShoppingItem,
   updateShoppingItems,
-  addShoppingItemCheckboxListeners,
+  addShoppingItemListeners,
 } from './shoppingList.js';
 
 export function redrawHeader() {
@@ -94,7 +94,7 @@ export function fullRender() {
       pageContent.innerHTML = appState.shoppingList
         .map(setupShoppingItem)
         .join('');
-      addShoppingItemCheckboxListeners();
+      addShoppingItemListeners();
     }
   }
 

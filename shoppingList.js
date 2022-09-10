@@ -1,7 +1,3 @@
-const TODAY = new Date();
-
-const previousCompleteDates = {};
-
 export function setupShoppingItem(shoppingItem, index) {
   return `
     <div class="shoppingItem" id="shoppingItem${index}">
@@ -10,11 +6,7 @@ export function setupShoppingItem(shoppingItem, index) {
         <div class="stats">
           <div>
             <span>Store:</span>
-            <span>${shoppingItem.Store || 'None'}</span>
-          </div>
-          <div>
-            <span>Priority:</span>
-            <span>${shoppingItem.Priority || 'Never'}</span>
+            <span>${shoppingItem.Store || 'N/A'}</span>
           </div>
           ${
             shoppingItem.Qty
@@ -25,6 +17,16 @@ export function setupShoppingItem(shoppingItem, index) {
           </div>`
               : ''
           }
+          <select>
+            ${Object.values(window.priorities)
+              .map(
+                (priorityString) =>
+                  `<option ${
+                    shoppingItem.Priority === priorityString ? 'selected' : ''
+                  }>${priorityString}</option>`
+              )
+              .join('')}
+          </select>
         </div>
       </details>
       <input type="checkbox" class="checkbox"/>
@@ -38,7 +40,7 @@ export function updateShoppingItems() {
   });
 }
 
-export function addShoppingItemCheckboxListeners() {
+export function addShoppingItemListeners() {
   appState.shoppingList.forEach((shoppingItem, index) => {
     const checkboxElement = document
       .getElementById(`shoppingItem${index}`)
