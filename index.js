@@ -6,19 +6,12 @@ const API_KEY = 'AIzaSyBg-Ub1hnzOjSeMr0g-qDVhA5eOtlgl3ok';
 const DISCOVERY_DOC =
   'https://sheets.googleapis.com/$discovery/rest?version=v4';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-
-const modes = {
-  CHORES: 'CHORES',
-  SHOPPING_LIST: 'SHOPPING_LIST',
-};
-window.modes = modes;
-const priorities = {
-  NEED: '1 - Need',
-  WANT: '2 - Want',
-  WISHLIST: '3 - Wishlist',
-  HAVE: '4 - Have',
-};
-window.priorities = priorities;
+import {
+  ALL_CHORE_CATEGORIES,
+  ALL_STORES,
+  MODES,
+  PRIORITIES,
+} from './constants.js';
 
 const appState = {
   tokenClient: null,
@@ -29,9 +22,11 @@ const appState = {
   refreshingCount: null,
   allChores: null,
   shoppingList: null,
-  mode: modes.CHORES,
+  mode: MODES.CHORES,
   filters: {
-    shoppingListPriority: priorities.NEED,
+    choreCategory: ALL_CHORE_CATEGORIES,
+    shoppingListPriority: PRIORITIES.NEED,
+    shoppingListStore: ALL_STORES,
   },
 };
 window.appState = appState;
@@ -169,10 +164,10 @@ function setupButtonEvents() {
   authorizeButton.addEventListener('click', handleAuthClick);
   signoutButton.addEventListener('click', handleSignoutClick);
   modeButton.addEventListener('click', () => {
-    if (appState.mode === modes.CHORES) {
-      appState.mode = modes.SHOPPING_LIST;
+    if (appState.mode === MODES.CHORES) {
+      appState.mode = MODES.SHOPPING_LIST;
     } else {
-      appState.mode = modes.CHORES;
+      appState.mode = MODES.CHORES;
     }
     fullRender();
   });

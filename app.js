@@ -1,3 +1,4 @@
+import { MODES } from './constants.js';
 import {
   setupChore,
   updateChores,
@@ -50,7 +51,7 @@ export function redrawHeader() {
     } else {
       modeButton.style.display = null;
       filtersNav.style.display = null;
-      if (appState.mode === window.modes.CHORES) {
+      if (appState.mode === MODES.CHORES) {
         message.innerHTML = 'Chores loaded';
         modeButton.innerText = 'Shopping List';
         filtersNav.innerHTML = renderChoreFilters();
@@ -67,7 +68,7 @@ export function redrawHeader() {
 }
 
 export function redrawList() {
-  if (window.appState.mode === window.modes.CHORES) {
+  if (window.appState.mode === MODES.CHORES) {
     updateChores();
   } else {
     updateShoppingItems();
@@ -92,7 +93,7 @@ export function fullRender() {
     pageContent.innerHTML = '';
     return;
   }
-  if (appState.mode === window.modes.CHORES) {
+  if (appState.mode === MODES.CHORES) {
     if (appState.allChores.length === 0) {
       pageContent.innerHTML = 'No data found!';
     } else {

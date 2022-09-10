@@ -1,9 +1,22 @@
+import { ALL_CHORE_CATEGORIES, CHORE_CATEGORIES } from './constants.js';
+
 const TODAY = new Date();
 
 const previousCompleteDates = {};
 
 export function renderChoreFilters() {
-  return '';
+  return `
+    <select data-filter="choreCategory" onchange="handleFilterChange()">
+        ${CHORE_CATEGORIES.map(
+          (category) =>
+            `<option ${
+              window.appState.filters.choreCategory === category
+                ? 'selected'
+                : ''
+            }>${category}</option>`
+        ).join('')}
+    </select>
+  `;
 }
 
 export function setupChore(chore, index) {
@@ -55,6 +68,24 @@ function getChoreState(chore, index) {
   return { choreCompleteToday, choreDue };
 }
 
+function isChoreVisible(chore) {
+  const passesCategoryFilter =
+    window.appState.filters.choreCategory === ALL_CHORE_CATEGORIES ||
+    window.appState.filters.choreCategory === chore.Category;
+  return passesCategoryFilter;
+}
+
+function getNextVisibleChoreState(index) {
+  while (index < window.appState.allChores.length) {
+    const chore = window.appState.allChores[index];
+    if (isChoreVisible(chore)) {
+      return getChoreState(chore, index);
+    }
+    index += 1;
+  }
+  return null;
+}
+
 export function updateChores() {
   window.appState.allChores.forEach((chore, index) => {
     const { choreCompleteToday, choreDue } = getChoreState(chore, index);
@@ -66,20 +97,20 @@ export function updateChores() {
     const checkboxElement = choreElement.querySelector('.checkbox');
     checkboxElement.checked = choreCompleteToday;
 
+    choreElement.style.display = isChoreVisible(chore) ? null : 'none';
+
     const dividerElement = document.getElementById(`divider${index}`);
     if (dividerElement !== null) {
-      const nextChoreState = getChoreState(
-        window.appState.allChores[index + 1],
-        index + 1
-      );
+      const nextChoreState = getNextVisibleChoreState(index + 1);
       dividerElement.classList.toggle(
         'due',
-        choreDue || nextChoreState.choreDue
+        choreDue || nextChoreState?.choreDue
       );
       dividerElement.classList.toggle(
         'complete',
-        choreCompleteToday || nextChoreState.choreCompleteToday
+        choreCompleteToday || nextChoreState?.choreCompleteToday
       );
+      dividerElement.style.display = isChoreVisible(chore) ? null : 'none';
     }
   });
 }

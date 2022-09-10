@@ -39,6 +39,9 @@ content {
   width: 100%;
   align-items: center;
 }
+.shoppingItem {
+  border-bottom: 1px solid #ccc;
+}
 .chore details,
 .shoppingItem details {
   width: 100%;

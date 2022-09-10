@@ -1,5 +1,7 @@
+import { ALL_PRIORITIES, ALL_STORES, STORES, PRIORITIES } from './constants.js';
+
 function renderShoppingPriorityOptions(selectedCallback) {
-  return Object.values(window.priorities)
+  return Object.values(PRIORITIES)
     .map(
       (priorityString) =>
         `<option ${
@@ -16,6 +18,21 @@ export function renderShoppingListFilters() {
           (priorityString) =>
             window.appState.filters.shoppingListPriority === priorityString
         )}
+        <option ${
+          window.appState.filters.shoppingListPriority === ALL_PRIORITIES
+            ? 'selected'
+            : ''
+        }>Show All</option>
+      </select>
+      <select data-filter="shoppingListStore" onchange="handleFilterChange()">
+          ${STORES.map(
+            (store) =>
+              `<option ${
+                window.appState.filters.shoppingListStore === store
+                  ? 'selected'
+                  : ''
+              }>${store}</option>`
+          ).join('')}
       </select>
   `;
 }
@@ -47,7 +64,7 @@ export function setupShoppingItem(shoppingItem, index) {
         </div>
       </details>
       <input type="checkbox" class="checkbox" ${
-        shoppingItem.Priority === window.priorities.HAVE ? 'checked' : ''
+        shoppingItem.Priority === PRIORITIES.HAVE ? 'checked' : ''
       }/>
     </div>
   `;
@@ -57,10 +74,15 @@ export function updateShoppingItems() {
   window.appState.shoppingList.forEach((shoppingItem, index) => {
     const element = document.getElementById(`shoppingItem${index}`);
 
+    const passesPriorityFilter =
+      window.appState.filters.shoppingListPriority === shoppingItem.Priority ||
+      window.appState.filters.shoppingListPriority === ALL_PRIORITIES;
+    const passesStoreFilter =
+      window.appState.filters.shoppingListStore === ALL_STORES ||
+      window.appState.filters.shoppingListStore === shoppingItem.Store;
+
     element.style.display =
-      window.appState.filters.shoppingListPriority === shoppingItem.Priority
-        ? null
-        : 'none';
+      passesPriorityFilter && passesStoreFilter ? null : 'none';
   });
 }
 
@@ -71,9 +93,9 @@ export function addShoppingItemListeners() {
     const checkboxElement = element.querySelector('.checkbox');
     checkboxElement.addEventListener('change', () => {
       if (checkboxElement.checked) {
-        window.updateShoppingListItemPriority(index, window.priorities.HAVE);
+        window.updateShoppingListItemPriority(index, PRIORITIES.HAVE);
       } else {
-        window.updateShoppingListItemPriority(index, window.priorities.NEED);
+        window.updateShoppingListItemPriority(index, PRIORITIES.NEED);
       }
     });
 
