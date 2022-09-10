@@ -1,4 +1,4 @@
-import { render, updateChores } from './app.js';
+import { fullRender, redrawHeader, redrawList } from './app.js';
 
 const CLIENT_ID =
   '1065408495518-kmhvq7drlk415qa0al8nl3lgpdte6pui.apps.googleusercontent.com';
@@ -7,13 +7,22 @@ const DISCOVERY_DOC =
   'https://sheets.googleapis.com/$discovery/rest?version=v4';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
+const modes = {
+  CHORES: 'CHORES',
+  SHOPPING_LIST: 'SHOPPING_LIST',
+};
+window.modes = modes;
+
 const appState = {
   tokenClient: null,
   gapiInited: false,
   gisInited: false,
   isLoggedIn: false,
   loadingError: null,
+  isRefreshing: false,
   allChores: null,
+  shoppingList: null,
+  mode: modes.CHORES,
 };
 window.appState = appState;
 
@@ -24,8 +33,8 @@ function handleAuthClick() {
     }
     appState.allChores = null;
     appState.isLoggedIn = true;
-    render();
-    await getChores();
+    fullRender();
+    await refreshData();
   };
 
   const currentToken = gapi.client.getToken();
@@ -45,30 +54,17 @@ function handleSignoutClick() {
     google.accounts.oauth2.revoke(token.access_token);
     gapi.client.setToken('');
     appState.isLoggedIn = false;
-    render();
+    fullRender();
   }
 }
 
-async function getChores() {
-  let response;
-  try {
-    response = await gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
-      range: 'Chores List!A1:I',
-    });
-  } catch (err) {
-    appState.loadingError = err;
-    render();
-    return;
-  }
+function responseToObjectList(response) {
   const range = response.result;
   if (!range || !range.values || range.values.length == 0) {
-    appState.allChores = [];
-    render();
-    return;
+    return [];
   }
   const headers = range.values.shift();
-  appState.allChores = range.values.map((row) =>
+  return range.values.map((row) =>
     row.reduce(
       (agg, value, index) => ({
         ...agg,
@@ -77,7 +73,31 @@ async function getChores() {
       {}
     )
   );
-  render();
+}
+
+async function refreshData() {
+  let choresResponse, shoppingResponse;
+  try {
+    [choresResponse, shoppingResponse] = await Promise.all([
+      gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
+        range: 'Chores List!A1:I',
+      }),
+      gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
+        range: 'Shopping List!A1:D',
+      }),
+    ]);
+  } catch (err) {
+    appState.loadingError = err;
+    appState.allChores = null;
+    appState.shoppingList = null;
+    fullRender();
+    return;
+  }
+  appState.allChores = responseToObjectList(choresResponse);
+  appState.shoppingList = responseToObjectList(shoppingResponse);
+  fullRender();
 }
 
 window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
@@ -91,23 +111,38 @@ window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
     });
   } catch (err) {
     appState.loadingError = err;
-    render();
+    fullRender();
     return;
   }
-  window.setTimeout(updateChores, 5000);
+  appState.isRefreshing = true;
+  redrawHeader();
+  window.setTimeout(() => {
+    appState.isRefreshing = false;
+    redrawHeader();
+    redrawList();
+  }, 5000);
 };
 
 function setupButtonEvents() {
   const authorizeButton = document.getElementById('authorize_button');
   const signoutButton = document.getElementById('signout_button');
+  const modeButton = document.getElementById('mode_button');
 
   authorizeButton.addEventListener('click', handleAuthClick);
   signoutButton.addEventListener('click', handleSignoutClick);
+  modeButton.addEventListener('click', () => {
+    if (appState.mode === modes.CHORES) {
+      appState.mode = modes.SHOPPING_LIST;
+    } else {
+      appState.mode = modes.CHORES;
+    }
+    fullRender();
+  });
 }
 
 window.addEventListener('load', () => {
   setupButtonEvents();
-  render();
+  fullRender();
 });
 function gapiLoaded() {
   gapi.load('client', async () => {
@@ -116,7 +151,7 @@ function gapiLoaded() {
       discoveryDocs: [DISCOVERY_DOC],
     });
     appState.gapiInited = true;
-    render();
+    fullRender();
   });
 }
 function gisLoaded() {
@@ -126,7 +161,7 @@ function gisLoaded() {
     callback: '', // defined later
   });
   appState.gisInited = true;
-  render();
+  fullRender();
 }
 window.addEventListener('DOMContentLoaded', () => {
   gapiLoaded();

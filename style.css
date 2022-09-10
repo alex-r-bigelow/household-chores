@@ -6,21 +6,41 @@ pre {
 }
 
 header {
+  position: fixed;
   padding: 1em;
+  background: white;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3em;
+  border-bottom: 1px solid #333;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
 }
-header > * {
+nav {
+  display: flex;
+  justify-content: space-between;
+}
+nav > * {
   margin-right: 1em;
 }
 
-.chore {
+content {
+  position: absolute;
+  width: 100%;
+  top: 5em;
+}
+
+.chore,
+.shoppingItem {
   display: flex;
   width: 100%;
   align-items: center;
-  border-top: 1px solid #333;
 }
-.chore details {
+.chore details,
+.shoppingItem details {
   width: 100%;
   margin-left: 1em;
 }
@@ -48,4 +68,17 @@ header > * {
 }
 .chore.complete .task {
   text-decoration: line-through;
+}
+.divider {
+  margin: 0;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  border-bottom: 1px solid #ccc;
+}
+.divider.due {
+  border-bottom: 1px solid #d95f02;
+}
+.divider.complete {
+  border-bottom: 1px solid #1b9e77;
 }
