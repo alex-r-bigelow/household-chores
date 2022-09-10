@@ -30,6 +30,9 @@ const appState = {
   allChores: null,
   shoppingList: null,
   mode: modes.CHORES,
+  filters: {
+    shoppingListPriority: priorities.NEED,
+  },
 };
 window.appState = appState;
 
@@ -146,6 +149,16 @@ function setupButtonEvents() {
     fullRender();
   });
 }
+
+window.handleFilterChange = function () {
+  const filters_nav = document.getElementById('filters_nav');
+  filters_nav.querySelectorAll('[data-filter]').forEach((filterFormElement) => {
+    appState.filters[filterFormElement.dataset.filter] =
+      filterFormElement.value;
+  });
+  redrawHeader();
+  redrawList();
+};
 
 window.addEventListener('load', () => {
   setupButtonEvents();

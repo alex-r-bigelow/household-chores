@@ -2,6 +2,10 @@ const TODAY = new Date();
 
 const previousCompleteDates = {};
 
+export function renderChoreFilters() {
+  return '';
+}
+
 export function setupChore(chore, index) {
   return `
     <div class="chore" id="chore${index}">

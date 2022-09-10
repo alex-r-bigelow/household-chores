@@ -1,3 +1,25 @@
+function renderShoppingPriorityOptions(selectedCallback) {
+  return Object.values(window.priorities)
+    .map(
+      (priorityString) =>
+        `<option ${
+          selectedCallback(priorityString) ? 'selected' : ''
+        }>${priorityString}</option>`
+    )
+    .join('');
+}
+
+export function renderShoppingListFilters() {
+  return `
+      <select data-filter="shoppingListPriority" onchange="handleFilterChange()">
+        ${renderShoppingPriorityOptions(
+          (priorityString) =>
+            window.appState.filters.shoppingListPriority === priorityString
+        )}
+      </select>
+  `;
+}
+
 export function setupShoppingItem(shoppingItem, index) {
   return `
     <div class="shoppingItem" id="shoppingItem${index}">
@@ -18,14 +40,9 @@ export function setupShoppingItem(shoppingItem, index) {
               : ''
           }
           <select>
-            ${Object.values(window.priorities)
-              .map(
-                (priorityString) =>
-                  `<option ${
-                    shoppingItem.Priority === priorityString ? 'selected' : ''
-                  }>${priorityString}</option>`
-              )
-              .join('')}
+            ${renderShoppingPriorityOptions(
+              (priorityString) => shoppingItem.Priority === priorityString
+            )}
           </select>
         </div>
       </details>
@@ -35,13 +52,18 @@ export function setupShoppingItem(shoppingItem, index) {
 }
 
 export function updateShoppingItems() {
-  appState.shoppingList.forEach((shoppingItem, index) => {
-    // TODO
+  window.appState.shoppingList.forEach((shoppingItem, index) => {
+    const element = document.getElementById(`shoppingItem${index}`);
+
+    element.style.display =
+      window.appState.filters.shoppingListPriority === shoppingItem.Priority
+        ? null
+        : 'none';
   });
 }
 
 export function addShoppingItemListeners() {
-  appState.shoppingList.forEach((shoppingItem, index) => {
+  window.appState.shoppingList.forEach((shoppingItem, index) => {
     const checkboxElement = document
       .getElementById(`shoppingItem${index}`)
       .querySelector('.checkbox');
