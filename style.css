@@ -1,6 +1,46 @@
+/* josefin-sans-regular - latin */
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/josefin-sans-v25-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+    url('/fonts/josefin-sans-v25-latin-regular.eot?#iefix')
+      format('embedded-opentype'),
+    /* IE6-IE8 */ url('/fonts/josefin-sans-v25-latin-regular.woff2')
+      format('woff2'),
+    /* Super Modern Browsers */
+      url('/fonts/josefin-sans-v25-latin-regular.woff') format('woff'),
+    /* Modern Browsers */ url('/fonts/josefin-sans-v25-latin-regular.ttf')
+      format('truetype'),
+    /* Safari, Android, iOS */
+      url('/fonts/josefin-sans-v25-latin-regular.svg#JosefinSans') format('svg'); /* Legacy iOS */
+}
+/* josefin-sans-700 - latin */
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/josefin-sans-v25-latin-700.eot'); /* IE9 Compat Modes */
+  src: local(''),
+    url('/fonts/josefin-sans-v25-latin-700.eot?#iefix')
+      format('embedded-opentype'),
+    /* IE6-IE8 */ url('/fonts/josefin-sans-v25-latin-700.woff2') format('woff2'),
+    /* Super Modern Browsers */ url('/fonts/josefin-sans-v25-latin-700.woff')
+      format('woff'),
+    /* Modern Browsers */ url('/fonts/josefin-sans-v25-latin-700.ttf')
+      format('truetype'),
+    /* Safari, Android, iOS */
+      url('/fonts/josefin-sans-v25-latin-700.svg#JosefinSans') format('svg'); /* Legacy iOS */
+}
+
 html,
-body,
-pre {
+body {
+  font-family: 'Josefin Sans';
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
 }
@@ -8,17 +48,40 @@ pre {
 header {
   position: fixed;
   padding: 1em;
-  background: white;
   top: 0;
   left: 0;
   right: 0;
   height: 5em;
-  border-bottom: 1px solid #333;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 }
+header.loaded {
+  background: #f4cae4;
+  border-bottom: 1px solid #e7298a;
+  color: #e7298a;
+}
+header.chores {
+  background: #cbd5e8;
+  border-bottom: 1px solid #7570b3;
+  color: #7570b3;
+}
+header.shoppingList {
+  background: #e6f5c9;
+  border-bottom: 1px solid #66a61e;
+  color: #66a61e;
+}
+header.refreshing {
+  background: #fff2ae;
+  border-bottom: 1px solid #e6ab02;
+  color: #e6ab02;
+}
+
+header #message {
+  font-weight: bold;
+}
+
 nav {
   display: flex;
   justify-content: space-between;

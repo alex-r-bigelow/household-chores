@@ -106,6 +106,7 @@ async function refreshData() {
 }
 
 window.startDelayedRefresh = (seconds = 5) => {
+  const header = document.getElementById('header');
   window.clearTimeout(window.refreshTimeout);
   if (seconds === 0) {
     appState.refreshingCount = null;
@@ -113,6 +114,7 @@ window.startDelayedRefresh = (seconds = 5) => {
   } else {
     appState.refreshingCount = seconds;
     redrawHeader();
+    header.className = 'refreshing';
     window.refreshTimeout = window.setTimeout(() => {
       window.startDelayedRefresh(seconds - 1);
     }, 1000);

@@ -15,11 +15,14 @@ import {
 export function redrawHeader() {
   const appState = window.appState;
 
+  const header = document.getElementById('header');
   const authorizeButton = document.getElementById('authorize_button');
   const signoutButton = document.getElementById('signout_button');
   const modeButton = document.getElementById('mode_button');
   const filtersNav = document.getElementById('filters_nav');
   const message = document.getElementById('message');
+
+  header.className = '';
 
   if (!appState.gapiInited || !appState.gisInited) {
     authorizeButton.style.display = 'none';
@@ -30,6 +33,7 @@ export function redrawHeader() {
     return;
   }
 
+  header.classList.add('loaded');
   authorizeButton.style.display = null;
 
   if (!appState.isLoggedIn) {
@@ -52,10 +56,12 @@ export function redrawHeader() {
       modeButton.style.display = null;
       filtersNav.style.display = null;
       if (appState.mode === MODES.CHORES) {
+        header.classList.add('chores');
         message.innerHTML = 'Chores loaded';
         modeButton.innerText = 'Shopping List';
         filtersNav.innerHTML = renderChoreFilters();
       } else {
+        header.classList.add('shoppingList');
         message.innerHTML = 'Shopping list loaded';
         modeButton.innerText = 'Chores List';
         filtersNav.innerHTML = renderShoppingListFilters();
