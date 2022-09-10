@@ -94,7 +94,7 @@ window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
     render();
     return;
   }
-  updateChores();
+  window.setTimeout(updateChores, 5000);
 };
 
 function setupButtonEvents() {

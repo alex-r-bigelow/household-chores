@@ -5,7 +5,6 @@ const previousCompleteDates = {};
 function setupChore(chore, index) {
   return `
     <div class="chore" id="chore${index}">
-      <input type="checkbox" class="checkbox"/>
       <details>
         <summary class="task">${chore.Task}</summary>
         <div class="stats">
@@ -29,6 +28,7 @@ function setupChore(chore, index) {
         <div class="description">${chore.Description || ''}</div>
         <div class="notes">${chore.Notes || ''}</div>
       </details>
+      <input type="checkbox" class="checkbox"/>
     </div>
   `;
 }
@@ -36,17 +36,20 @@ function setupChore(chore, index) {
 export function updateChores() {
   appState.allChores.forEach((chore, index) => {
     const dueDate = new Date(chore.Due);
-    const choreComplete =
+    const completeDate = new Date(chore.Completed);
+    const choreDueToday = !isNaN(dueDate) && dueDate <= TODAY;
+    const choreCompleteToday =
       previousCompleteDates[`chore${index}`] !== undefined ||
-      (!isNaN(dueDate) && dueDate.toDateString() === TODAY.toDateString());
-    const choreDue = !choreComplete && !isNaN(dueDate) && dueDate < TODAY;
+      (!isNaN(completeDate) &&
+        completeDate.toLocaleDateString() === TODAY.toLocaleDateString());
+    const choreDue = choreDueToday && !choreCompleteToday;
 
     const choreElement = document.getElementById(`chore${index}`);
     choreElement.classList.toggle('due', choreDue);
-    choreElement.classList.toggle('complete', choreComplete);
+    choreElement.classList.toggle('complete', choreCompleteToday);
 
     const checkboxElement = choreElement.querySelector('.checkbox');
-    checkboxElement.checked = choreComplete;
+    checkboxElement.checked = choreCompleteToday;
   });
 }
 
@@ -59,13 +62,14 @@ function addCheckboxListeners() {
       if (checkboxElement.checked) {
         // Just checked something
         previousCompleteDates[`chore${index}`] = chore.Completed || '';
-        window.updateChoreCompletedDate(index, TODAY.toDateString());
+        window.updateChoreCompletedDate(index, TODAY.toLocaleDateString());
       } else {
         const previousCompleteDate =
           previousCompleteDates[`chore${index}`] || '';
         delete previousCompleteDates[`chore${index}`];
         window.updateChoreCompletedDate(index, previousCompleteDate);
       }
+      updateChores();
     });
   });
 }
