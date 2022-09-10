@@ -39,14 +39,16 @@ export function setupShoppingItem(shoppingItem, index) {
           </div>`
               : ''
           }
-          <select>
+          <select class="prioritySelect">
             ${renderShoppingPriorityOptions(
               (priorityString) => shoppingItem.Priority === priorityString
             )}
           </select>
         </div>
       </details>
-      <input type="checkbox" class="checkbox"/>
+      <input type="checkbox" class="checkbox" ${
+        shoppingItem.Priority === window.priorities.HAVE ? 'checked' : ''
+      }/>
     </div>
   `;
 }
@@ -64,11 +66,20 @@ export function updateShoppingItems() {
 
 export function addShoppingItemListeners() {
   window.appState.shoppingList.forEach((shoppingItem, index) => {
-    const checkboxElement = document
-      .getElementById(`shoppingItem${index}`)
-      .querySelector('.checkbox');
+    const element = document.getElementById(`shoppingItem${index}`);
+
+    const checkboxElement = element.querySelector('.checkbox');
     checkboxElement.addEventListener('change', () => {
-      // TODO
+      if (checkboxElement.checked) {
+        window.updateShoppingListItemPriority(index, window.priorities.HAVE);
+      } else {
+        window.updateShoppingListItemPriority(index, window.priorities.NEED);
+      }
+    });
+
+    const selectElement = element.querySelector('.prioritySelect');
+    selectElement.addEventListener('change', () => {
+      window.updateShoppingListItemPriority(index, selectElement.value);
     });
   });
 }

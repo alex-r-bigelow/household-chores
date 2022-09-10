@@ -26,7 +26,7 @@ const appState = {
   gisInited: false,
   isLoggedIn: false,
   loadingError: null,
-  isRefreshing: false,
+  refreshingCount: null,
   allChores: null,
   shoppingList: null,
   mode: modes.CHORES,
@@ -110,6 +110,20 @@ async function refreshData() {
   fullRender();
 }
 
+window.startDelayedRefresh = (seconds = 5) => {
+  window.clearTimeout(window.refreshTimeout);
+  if (seconds === 0) {
+    appState.refreshingCount = null;
+    refreshData();
+  } else {
+    appState.refreshingCount = seconds;
+    redrawHeader();
+    window.refreshTimeout = window.setTimeout(() => {
+      window.startDelayedRefresh(seconds - 1);
+    }, 1000);
+  }
+};
+
 window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
   let response;
   try {
@@ -124,13 +138,27 @@ window.updateChoreCompletedDate = async function (rowNumber, completedDate) {
     fullRender();
     return;
   }
-  appState.isRefreshing = true;
-  redrawHeader();
-  window.setTimeout(() => {
-    appState.isRefreshing = false;
-    redrawHeader();
-    redrawList();
-  }, 5000);
+  window.startDelayedRefresh();
+};
+
+window.updateShoppingListItemPriority = async function (
+  rowNumber,
+  priorityString
+) {
+  let response;
+  try {
+    response = await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId: '12AsuFHX5a2OJdzM_V5_TinTDT7ttFCVehpxhL-kUAjk',
+      range: `Shopping List!D${rowNumber + 2}`,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: [[priorityString]] },
+    });
+  } catch (err) {
+    appState.loadingError = err;
+    fullRender();
+    return;
+  }
+  window.startDelayedRefresh();
 };
 
 function setupButtonEvents() {

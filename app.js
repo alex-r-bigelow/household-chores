@@ -59,8 +59,8 @@ export function redrawHeader() {
         modeButton.innerText = 'Chores List';
         filtersNav.innerHTML = renderShoppingListFilters();
       }
-      if (appState.isRefreshing) {
-        message.innerHTML = 'Refreshing list...';
+      if (appState.refreshingCount) {
+        message.innerHTML = `Refreshing in ${appState.refreshingCount}...`;
       }
     }
   }
